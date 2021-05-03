@@ -1,7 +1,8 @@
-# Ybat - YOLO BBox Annotation Tool
-Fast and efficient BBox annotation for your images in YOLO, and now, VOC/COCO formats!
+# Kbat - KITTI BBox Annotation Tool
+Fast and efficient BBox annotation for your images in KITTI
 
 ## INTRO
+Fork created to label dataset in KITTI format
 To see why and for what this was created, please read [Ybat - YOLO BBox Annotation Tool](https://medium.com/@drainingsun/ybat-yolo-bbox-annotation-tool-96fb765d0036)
 
 ![Sample](cute.png)
@@ -9,11 +10,11 @@ To see why and for what this was created, please read [Ybat - YOLO BBox Annotati
 ## USAGE
 1. Download the zip.
 2. Extract it.
-3. Open `ybat.html` in your browser.
+3. Open `kbat.html` in your browser.
 4. Load images and classes and start bboxing!
 
 ## CONFIGURATION
-1. Open ybat.js.
+1. Open kbat.js.
 2. Edit section named `parameters`.
 
 ## COMPATIBILITY
@@ -27,7 +28,6 @@ All browsers that support ES6 should work. Tested with:
 No idea about IE/Edge.
 
 ## FEATURES
-* **NEW! Basic Pascal VOC and COCO format support.**
 * Works in your browser on any platform.
 * Complete YOLO format support.
 * No need for image upload - everything is done locally!
