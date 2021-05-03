@@ -2,7 +2,8 @@
 Fast and efficient BBox annotation for your images in KITTI
 
 ## INTRO
-Fork created to label dataset in KITTI format
+Fork created to label dataset in KITTI format.
+
 To see why and for what this was created, please read [Ybat - YOLO BBox Annotation Tool](https://medium.com/@drainingsun/ybat-yolo-bbox-annotation-tool-96fb765d0036)
 
 ![Sample](cute.png)
