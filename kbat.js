@@ -33,10 +33,17 @@
         value : false,
         setState(bool){
             if (bool){
-                document.getElementById("occluded").disabled = false;
-                document.getElementById("truncated").disabled = false;
-                document.getElementById("occluded").value = currentBbox.bbox.occluded
-                document.getElementById("truncated").value = currentBbox.bbox.truncated
+                if (currentBbox.bbox.class.toLowerCase() == "dontcare"){
+                    document.getElementById("occluded").disabled = true;
+                    document.getElementById("occluded").value = 0
+                    document.getElementById("truncated").disabled = true;
+                    document.getElementById("truncated").value = 0.0
+                }else{
+                    document.getElementById("occluded").disabled = false;
+                    document.getElementById("truncated").disabled = false;
+                    document.getElementById("occluded").value = currentBbox.bbox.occluded
+                    document.getElementById("truncated").value = currentBbox.bbox.truncated
+                }
             }else{
                 document.getElementById("occluded").disabled = true;
                 document.getElementById("occluded").value = 0
@@ -119,8 +126,9 @@
             listenClassSelect()
             listenBboxLoad()
             listenBboxSave()
-            //listenBboxVocSave()
-            //listenBboxCocoSave()
+            listenBboxSaveYOLO()
+            listenBboxVocSave()
+            listenBboxCocoSave()
             listenBboxRestore()
             listenKeyboard()
             listenImageSearch()
@@ -836,15 +844,6 @@
 
             document.getElementById("truncated").value = 0.00
             document.getElementById("occluded").value = 0
-
-            /*if (bboxes[currentImage.name].length>0){
-                console.log("ya")
-            }
-            if (bboxes[currentImage.name][currentClass]){
-                console.log("YA EXISTE")
-            }else{
-                document.getElementById("truncated").value = 0.00
-            }*/
         }
 
         if (currentBbox !== null) {
@@ -1089,6 +1088,176 @@
             zip.generateAsync({type: "blob"})
                 .then((blob) => {
                     saveAs(blob, "bboxes_kitti.zip")
+                })
+        })
+    }
+
+    const listenBboxSaveYOLO = () => {
+        document.getElementById("saveBboxesYOLO").addEventListener("click", () => {
+            const zip = new JSZip()
+
+            for (let imageName in bboxes) {
+                const image = images[imageName]
+
+                const name = imageName.split(".")
+
+                name[name.length - 1] = "txt"
+
+                const result = []
+
+                for (let className in bboxes[imageName]) {
+                    for (let i = 0; i < bboxes[imageName][className].length; i++) {
+                        const bbox = bboxes[imageName][className][i]
+
+                        // Prepare data for yolo format
+                        const x = (bbox.x + bbox.width / 2) / image.width
+                        const y = (bbox.y + bbox.height / 2) / image.height
+                        const width = bbox.width / image.width
+                        const height = bbox.height / image.height
+
+                        result.push(`${classes[className]} ${x} ${y} ${width} ${height}`)
+                    }
+                }
+
+                zip.file(name.join("."), result.join("\n"))
+            }
+
+            zip.generateAsync({type: "blob"})
+                .then((blob) => {
+                    saveAs(blob, "bboxes_yolo.zip")
+                })
+        })
+    }
+
+    const listenBboxVocSave = () => {
+        document.getElementById("saveVocBboxes").addEventListener("click", () => {
+            const folderPath = document.getElementById("vocFolder").value
+
+            const zip = new JSZip()
+
+            for (let imageName in bboxes) {
+                const image = images[imageName]
+
+                const name = imageName.split(".")
+
+                name[name.length - 1] = "xml"
+
+                const result = [
+                    "<?xml version=\"1.0\"?>",
+                    "<annotation>",
+                    `<folder>${folderPath}</folder>`,
+                    `<filename>${imageName}</filename>`,
+                    "<path/>",
+                    "<source>",
+                    "<database>Unknown</database>",
+                    "</source>",
+                    "<size>",
+                    `<width>${image.width}</width>`,
+                    `<height>${image.height}</height>`,
+                    "<depth>3</depth>",
+                    "</size>",
+                    "<segmented>0</segmented>"
+                ]
+
+                for (let className in bboxes[imageName]) {
+                    for (let i = 0; i < bboxes[imageName][className].length; i++) {
+                        const bbox = bboxes[imageName][className][i]
+
+                        result.push("<object>")
+                        result.push(`<name>${className}</name>`)
+                        result.push("<pose>Unspecified</pose>")
+                        result.push("<truncated>0</truncated>")
+                        result.push("<occluded>0</occluded>")
+                        result.push("<difficult>0</difficult>")
+
+                        result.push("<bndbox>")
+                        result.push(`<xmin>${bbox.x}</xmin>`)
+                        result.push(`<ymin>${bbox.y}</ymin>`)
+                        result.push(`<xmax>${bbox.x + bbox.width}</xmax>`)
+                        result.push(`<ymax>${bbox.y + bbox.height}</ymax>`)
+                        result.push("</bndbox>")
+
+                        result.push("</object>")
+                    }
+                }
+
+                result.push("</annotation>")
+
+                if (result.length > 15) {
+                    zip.file(name.join("."), result.join("\n"))
+                }
+            }
+
+            zip.generateAsync({type: "blob"})
+                .then((blob) => {
+                    saveAs(blob, "bboxes_voc.zip")
+                })
+        })
+    }
+
+    const listenBboxCocoSave = () => {
+        document.getElementById("saveCocoBboxes").addEventListener("click", () => {
+            const zip = new JSZip()
+
+            const result = {
+                images: [],
+                type: "instances",
+                annotations: [],
+                categories: []
+            }
+
+            for (let className in classes) {
+                result.categories.push({
+                    supercategory: "none",
+                    id: classes[className] + 1,
+                    name: className
+                })
+            }
+
+            for (let imageName in images) {
+                result.images.push({
+                    id: images[imageName].index + 1,
+                    file_name: imageName, //eslint-disable-line camelcase
+                    width: images[imageName].width,
+                    height: images[imageName].height
+                })
+            }
+
+            let id = 0
+
+            for (let imageName in bboxes) {
+                const image = images[imageName]
+
+                for (let className in bboxes[imageName]) {
+                    for (let i = 0; i < bboxes[imageName][className].length; i++) {
+                        const bbox = bboxes[imageName][className][i]
+
+                        const segmentation = [
+                            bbox.x, bbox.y,
+                            bbox.x, bbox.y + bbox.height,
+                            bbox.x + bbox.width, bbox.y + bbox.height,
+                            bbox.x + bbox.width, bbox.y
+                        ]
+
+                        result.annotations.push({
+                            segmentation: segmentation,
+                            area: bbox.width * bbox.height,
+                            iscrowd: 0,
+                            ignore: 0,
+                            image_id: image.index + 1, //eslint-disable-line camelcase
+                            bbox: [bbox.x, bbox.y, bbox.width, bbox.height],
+                            category_id: classes[className] + 1, //eslint-disable-line camelcase
+                            id: ++id
+                        })
+                    }
+                }
+
+                zip.file("coco.json", JSON.stringify(result))
+            }
+
+            zip.generateAsync({type: "blob"})
+                .then((blob) => {
+                    saveAs(blob, "bboxes_coco.zip")
                 })
         })
     }

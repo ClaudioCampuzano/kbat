@@ -40,23 +40,34 @@
                 <label for="bboxes">Bboxes:</label>
                 <input type="file" id="bboxes" name="bboxes[]" accept="text/plain, application/zip" disabled multiple />
                 <input type="button" name="restoreBboxes" id="restoreBboxes" value="Restore" disabled />
+                <hr />
                 <input type="button" name="saveBboxes" id="saveBboxes" value="Save KITTI" />
-                <label for="Occluded">Occluded:</label>
-                <select name="occluded" id="occluded" disabled="disabled">
-                    <option value="0">fully visible</option> 
-                    <option value="1">partly occluded</option> 
-                    <option value="2">largely occluded</option>
-                    <option value="3">unknown</option> 
-                </select>
-                <label for="Truncated">Truncated:</label>
-                <input type="number" id="truncated" name="truncated" step="0.01" min="0.0" max="1.0" value="0.0" disabled="disabled">
 
-                <!--<div id="voc">
+                <div>
+                    <label for="Occluded">Occluded:</label>
+                    <select name="occluded" id="occluded" disabled="disabled">
+                        <option value="0">fully visible</option> 
+                        <option value="1">partly occluded</option> 
+                        <option value="2">largely occluded</option>
+                        <option value="3">unknown</option> 
+                    </select>
+                </div>
+
+                <div>
+                    <label for="Truncated">Truncated:</label>
+                    <input type="number" id="truncated" name="truncated" step="0.01" min="0.0" max="1.0" value="0.0" disabled="disabled">
+                </div>
+                
+                <hr />
+                <input type="button" name="saveBboxesYOLO" id="saveBboxesYOLO" value="Save YOLO" />
+                <hr />
+
+                <div id="voc">
                     <label for="vocFolder">Voc folder:</label>
                     <input type="text" id="vocFolder" name="vocFolder" value="data" />
                     <input type="button" name="saveVocBboxes" id="saveVocBboxes" value="Save VOC" />
                     <input type="button" name="saveCocoBboxes" id="saveCocoBboxes" value="Save COCO" />
-                </div>-->
+                </div>
                 <div id="coco">
 
                 </div>

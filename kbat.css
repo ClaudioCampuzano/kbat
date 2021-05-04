@@ -46,7 +46,7 @@ hr {
     margin-top: 10px;
 }
 
-#bboxes {
+#bboxes, #bboxesYOLO {
     width: 130px;
 }
 
@@ -57,7 +57,7 @@ hr {
     height: 18%;
 }
 
-#saveClasses, #saveBboxes, #saveVocBboxes, #saveCocoBboxes, #restoreBboxes, #cropImages {
+#saveClasses, #saveBboxes, #saveBboxesYOLO, #saveVocBboxes, #saveCocoBboxes, #restoreBboxes, #cropImages {
     float: right;
     margin-left: 10px;
     margin-top: 10px;
